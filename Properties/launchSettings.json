@@ -1,9 +1,0 @@
-{
-  "profiles": {
-    "COMP4976_Project": {
-      "commandName": "Project",
-      "commandLineArgs": "--port 7235",
-      "launchBrowser": false
-    }
-  }
-}
