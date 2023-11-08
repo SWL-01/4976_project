@@ -1,4 +1,4 @@
-namespace GPTApi;
+namespace ServerSideBlazor.Data;
 
 public class WeatherForecast
 {
