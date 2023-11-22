@@ -1,9 +1,80 @@
 ﻿@page "/"
+@using Newtonsoft.Json;
+@using System.Text;
+@using System.Net.Http.Headers;
 
-<PageTitle>Index</PageTitle>
+<PageTitle>Chatbot</PageTitle>
 
-<h1>Hello, world!</h1>
+<div class="container">
+    <div class="row">
+        <div class="col-4">
+            <p>@testing</p>
+        </div>
+        <div class="col-4">
+            <div class="messages">
+                @for (int i = 0; i < messages.Count; i++)
+                {
+                    @if (i % 2 == 0)
+                    {
+                        <div class="question">@messages[i]</div>
+                    }
+                    else
+                    {
+                        <div class="response">@messages[i]</div>
+                    }
+                }
+            </div>
+            <div class="textMessage">
+                <input @bind="message" />
+                <button @onclick="SendMessage">Send</button>
+            </div>
+        </div>
+        <div class="col-4">
+        </div>
+    </div>
+</div>
 
-Welcome to your new app.
+@code {
+    public string message;
+    public string testing;
+    public List<string> messages = new List<string>();
+    private static HttpClient Http = new HttpClient();
 
-<SurveyPrompt Title="How is Blazor working for you?" />
+    public class ApiResponse
+    {
+        public string question { get; set; }
+        public string answer { get; set; }
+    }
+
+    public async Task SendMessage()
+    {
+        var client = new HttpClient();
+        var request = new HttpRequestMessage
+        {
+            Method = HttpMethod.Post,
+            RequestUri = new Uri("https://simple-chatgpt-api.p.rapidapi.com/ask"),
+            Headers =
+            {
+                { "X-RapidAPI-Key", "8b1b2714d2msh19c8e1bbadddbffp18f8a6jsn3862b5350c90" },
+                { "X-RapidAPI-Host", "simple-chatgpt-api.p.rapidapi.com" },
+            },
+            Content = new StringContent("{\n \"question\": \"" + message + "\"\n}")
+            {
+                Headers =
+                {
+                    ContentType = new MediaTypeHeaderValue("application/json")
+                }
+            }
+        };
+        using (var response = await client.SendAsync(request))
+        {
+            response.EnsureSuccessStatusCode();
+            var body = await response.Content.ReadAsStringAsync();
+            var apiResponse = JsonConvert.DeserializeObject<ApiResponse>(body);
+            messages.Add(message); // add the question to the messages list
+            messages.Add(apiResponse.answer); // add the answer to the messages list
+            message = string.Empty;
+            StateHasChanged(); 
+        }
+    }
+}
