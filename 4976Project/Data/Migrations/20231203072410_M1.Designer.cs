@@ -11,7 +11,7 @@ using _4976Project.Data;
 namespace _4976Project.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20231203062347_M1")]
+    [Migration("20231203072410_M1")]
     partial class M1
     {
         /// <inheritdoc />
@@ -178,7 +178,6 @@ namespace _4976Project.Data.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Mbti")
-                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<string>("NormalizedEmail")

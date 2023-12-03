@@ -1,0 +1,95 @@
+﻿@page "/getMbti"
+@inject _4976Project.Services.MbtiService MbtiService
+@using Newtonsoft.Json;
+@using System.Text;
+@using System.Net.Http.Headers;
+@using Newtonsoft.Json.Linq;
+
+<PageTitle>Find MBTI</PageTitle>
+
+<div class="container">
+    <div class="row">
+        <div class="col-4">
+            <p>@testing</p>
+        </div>
+        <div class="col-4">
+            <div class="textMessage">
+                @* <input @bind="message" /> *@
+                1. <input @bind="message1" /> <br>
+                2. <input @bind="message2" /> <br>
+                3. <input @bind="message3" /> <br>
+                4. <input @bind="message4" /> <br>
+                5. <input @bind="message5" /> <br> <br>
+                <button @onclick="SendMessage">Send</button>
+            </div>
+            <div class="messages">
+                @if (messages.Count > 0) {
+                    <br>
+                    <p>Your MBTI type: <b>@MbtiService.ExtractMBTITypes(messages[0]).FirstOrDefault()</b></p>
+                    <div class="response">Description: @messages[0]</div>
+                    <p>If this sounds like your MBTI, click <b>Save</b>. Otherwise, please describe more about you.</p>
+                    <button @onclick="saveMbtiResults">Save</button>
+                }
+            </div>
+        </div>
+        <div class="col-4">
+        </div>
+    </div>
+</div>
+
+@code {
+    @* public string message; *@
+    public string message1;
+    public string message2;
+    public string message3;
+    public string message4;
+    public string message5;
+    public string testing;
+    public List<string> messages = new List<string>();
+    public string response;
+    private static HttpClient Http = new HttpClient();
+
+    public class ApiResponse
+    {
+        public string question { get; set; }
+        public string answer { get; set; }
+    }
+
+    public async Task SendMessage()
+    {
+        var client = new HttpClient();
+        var combinedMessage = $"Detect my personality based on mbti and these messages '{message1}', '{message2}', '{message3}', '{message4}', and '{message5}', what is this persons's MBTI type? Write final answer like you are istp or whatever.";
+        var request = new HttpRequestMessage
+            {
+                Method = HttpMethod.Post,
+                RequestUri = new Uri("https://chatgpt-api7.p.rapidapi.com/ask"),
+                Headers = {
+                    { "X-RapidAPI-Key", "8b1b2714d2msh19c8e1bbadddbffp18f8a6jsn3862b5350c90" },
+                    { "X-RapidAPI-Host", "chatgpt-api7.p.rapidapi.com" },
+                },
+                Content = new StringContent("{\r \"query\": \"" + combinedMessage + "\"\r }")
+                {
+                    Headers = { ContentType = new MediaTypeHeaderValue("application/json") }
+                }
+            };
+        using (var response = await client.SendAsync(request))
+        {
+            messages = new List<string>();
+            response.EnsureSuccessStatusCode();
+            var body = await response.Content.ReadAsStringAsync();
+            var json = JObject.Parse(body);
+            messages.Add(json["response"].ToString());
+            message1 = string.Empty;
+            message2 = string.Empty;
+            message3 = string.Empty;
+            message4 = string.Empty;
+            message5 = string.Empty;
+            StateHasChanged();
+        }
+    }
+
+    public async Task saveMbtiResults() {
+        var mbtiType = MbtiService.ExtractMBTITypes(messages[0]).FirstOrDefault();
+        await MbtiService.SaveMbtiResults(mbtiType);
+    }
+}

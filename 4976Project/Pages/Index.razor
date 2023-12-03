@@ -1,96 +1,10 @@
 ﻿@page "/"
-@using Newtonsoft.Json;
-@using System.Text;
-@using System.Net.Http.Headers;
-@using Newtonsoft.Json.Linq;
 
-<PageTitle>Chatbot</PageTitle>
+<PageTitle>Index</PageTitle>
 
-<div class="container">
-    <div class="row">
-        <div class="col-4">
-            <p>@testing</p>
-        </div>
-        <div class="col-4">
-            <div class="messages">
-                @for (int i = 0; i < messages.Count; i++)
-                {
-                    @if (i % 2 == 0)
-                    {
-                        <div class="question">@messages[i]</div>
-                    }
-                    else
-                    {
-                        <div class="response">@messages[i]</div>
-                    }
-                }
-            </div>
-            <div class="textMessage">
-                @* <input @bind="message" /> *@
-                <input @bind="message1" />
-                <input @bind="message2" />
-                <input @bind="message3" />
-                <input @bind="message4" />
-                <input @bind="message5" />
-                <button @onclick="SendMessage">Send</button>
-            </div>
-        </div>
-        <div class="col-4">
-        </div>
+<div class="px-4 py-5 my-5 text-center">
+    <h1 class="display-5 fw-bold">Welcome to 16 & me bot</h1>
+    <div class="col-lg-6 mx-auto">
+        <p class="lead mb-4">Produced by Taylor, Siwoon and Ellen</p>
     </div>
 </div>
-
-@code {
-    @* public string message; *@
-    public string message1;
-    public string message2;
-    public string message3;
-    public string message4;
-    public string message5;
-    public string testing;
-    public List<string> messages = new List<string>();
-    private static HttpClient Http = new HttpClient();
-
-    public class ApiResponse
-    {
-        public string question { get; set; }
-        public string answer { get; set; }
-    }
-
-    public async Task SendMessage()
-    {
-        var client = new HttpClient();
-        @* var combinedMessage = $"If a person say these words or behaves often, '{message1}', '{message2}', '{message3}', '{message4}', and '{message5}', what is this persons's MBTI type?"; *@
-        var combinedMessage = $"Detect my personality based on mbti and these messages '{message1}', '{message2}', '{message3}', '{message4}', and '{message5}', what is this persons's MBTI type? Write final answer like you are istp or whatever.";
-        var request = new HttpRequestMessage
-            {
-                Method = HttpMethod.Post,
-                RequestUri = new Uri("https://chatgpt-api8.p.rapidapi.com/"),
-                Headers = {
-                    { "X-RapidAPI-Key", "53a39bf8a1msh343c3bee691f274p13903cjsnd7aa789c4c84" },
-                    { "X-RapidAPI-Host", "chatgpt-api8.p.rapidapi.com" },
-                },
-                Content = new StringContent("[\r {\r \"content\": \"Hello! I'm an AI assistant bot based on ChatGPT 3. How may I help you?\",\r \"role\": \"system\"\r},\r {\r \"content\": \"" + combinedMessage + "\",\r \"role\": \"user\"\r}\r]")
-                {
-                    Headers = { ContentType = new MediaTypeHeaderValue("application/json") }
-                }
-            };
-        using (var response = await client.SendAsync(request))
-        {
-            response.EnsureSuccessStatusCode();
-            var body = await response.Content.ReadAsStringAsync();
-            var json = JObject.Parse(body);
-            @* var apiResponse = JsonConvert.DeserializeObject<ApiResponse>(body); *@
-            Console.WriteLine(body);
-            messages.Add(combinedMessage); // add the question to the messages list
-            @* messages.Add(apiResponse.answer); // add the answer to the messages list *@
-            messages.Add(json["text"].ToString());
-            message1 = string.Empty;
-            message2 = string.Empty;
-            message3 = string.Empty;
-            message4 = string.Empty;
-            message5 = string.Empty;
-            StateHasChanged();
-        }
-    }
-}

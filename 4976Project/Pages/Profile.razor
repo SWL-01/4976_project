@@ -1,0 +1,38 @@
+@page "/profile"
+@using Microsoft.AspNetCore.Identity
+@using _4976Project.Models
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject UserManager<ApplicationUser> UserManager
+
+<h3>User Profile</h3>
+
+@if (identityUser == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <p>Name: @identityUser.UserName</p>
+    @if (@identityUser.Mbti != null) {
+        <p>Mbti: @identityUser.Mbti</p>
+    } else {
+        <p>Mbti: Not Set</p>
+    }
+    <!-- Include other relevant user properties here -->
+}
+
+@code {
+    @* private user; *@
+    private ApplicationUser identityUser;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        
+        if (user.Identity.IsAuthenticated)
+        {
+            identityUser = await UserManager.FindByNameAsync(user.Identity.Name);
+        }
+    }
+}

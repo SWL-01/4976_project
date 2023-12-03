@@ -8,6 +8,6 @@ namespace _4976Project.Models
 {
     public class ApplicationUser : IdentityUser
     {
-        public string Mbti { get; set; }
+        public string? Mbti { get; set; }
     }
 }

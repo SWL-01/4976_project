@@ -175,7 +175,6 @@ namespace _4976Project.Data.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Mbti")
-                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<string>("NormalizedEmail")
