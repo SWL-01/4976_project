@@ -16,20 +16,23 @@
     <div class="row">
         <h4>Enter 5 words you say often or things that can describe your personality</h4> <br><br>
         <div class="col-4">
-            <div class="messages">
-                @for (int i = 0; i < messages.Count; i++) {
-                    @if (i % 2 == 0) {
-                        <div class="question">Your MBTI Type: <b>@messages[i]</b></div>
-                    } else {
-                        <div class="response">Description: @messages[i]</div>
-                        <div>
-                            <p>If this sounds like your MBTI, click <b>Save</b>. Otherwise, please describe more about you.</p>
-                            <button @onclick="saveMbtiResults" class="btn btn-success">Save</button>
-                            <button @onclick="HandleNoClick" class="btn btn-danger">No</button>
-                        </div>
+            @if (messages.Count > 0) {
+                <div class="messages">
+                    @for (int i = 0; i < messages.Count; i++) {
+                        @if (i % 2 == 0) {
+                            <div class="question">Your MBTI Type: <b>@messages[i]</b></div>
+                        } else {
+                            <div class="response">Description: @messages[i]</div>
+                            <div>
+                                <p>If this sounds like your MBTI, click <b>Save</b>. Otherwise, please describe more about you.</p>
+                                <button @onclick="saveMbtiResults" class="btn btn-success">Save</button>
+                                <button @onclick="HandleNoClick" class="btn btn-danger">No</button>
+                            </div>
+                        }
                     }
-                }
-            </div>
+                </div>
+            }
+
             @if (!responseReceived) {
                 <div class="textMessage">
                     @* <input @bind="message" /> *@

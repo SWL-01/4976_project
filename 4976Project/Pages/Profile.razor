@@ -17,36 +17,69 @@ else
 {
     <div class="container">
         <div class="row">
-            <div class="col-md-4">
+            <div class="col-md-4" style="margin-top: 50px; padding-right: 20px;">
                 <section>
-                    <form>
-                        <div class="form-floating mb-3">Name: @identityUser.UserName</div>
-                            @if (@identityUser.Mbti != null) {
-                                <div class="form-floating mb-3">Mbti: @identityUser.Mbti</div>
-                            } else {
-                                <div class="form-floating mb-3">Mbti: Not Set</div>
-                            }
+                    <form class="profileForm">
+                        <div class="form-floating mb-3">
+                            Name: <input type="text" class="profileInput" value="@identityUser.UserName" disabled>
+                        </div>
+                        @if (@identityUser.Mbti != null)
+                        {
+                            <div class="form-floating mb-3">Mbti: <input type="text" class="profileInput"
+                                    value="@identityUser.Mbti" disabled></div>
+                        }
+                        else
+                        {
+                            <div class="form-floating mb-3">Mbti: Not Set</div>
+                        }
                     </form>
                 </section>
+                <div class="findMbtiButton">
+                    <button class="btn btn-outline-primary" @onclick="() => getDescription(identityUser.Mbti)">What is
+                        @identityUser.Mbti like?</button>
+                    <button class="btn btn-outline-info" @onclick="() => findMatch(identityUser.Mbti)">Who matches well with
+                        @identityUser.Mbti?</button>
+                    <a class="btn btn-warning" href="/findMbti">Test again</a>
+                </div>
             </div>
+            @if (descriptionResponse)
+            {
+                <div class="col-md-6 col-md-offset-2">
+                    <section class="secondSection">
+                        <h4>What is @identityUser.Mbti like?</h4>
+                        <hr>
+                        <div class="descriptionBox">
+                            <p>@description</p>
+                        </div>
+                    </section>
+                </div>
+            }
+            @if (matchResponse)
+            {
+                <div class="col-md-6 col-md-offset-2">
+                    <section class="secondSection">
+                        <h4>Who matches well with @identityUser.Mbti?</h4>
+                        <hr>
+                        <div class="descriptionBox">
+                            <p>@matchDescription</p>
+                        </div>
+                    </section>
+                </div>
+            }
+
         </div>
     </div>
-    <p>Name: @identityUser.UserName</p>
-    @if (@identityUser.Mbti != null) {
-        <p>Mbti: @identityUser.Mbti</p>
-    } else {
-        <p>Mbti: Not Set</p>
-    }
-    <div class="findMbtiButton">
-        <button class="btn btn-primary" onclick="getDescription(@identityUser.Mbti)">What is @identityUser.Mbti like?</button>
-        <a class="btn btn-warning" href="/findMbti">Test again</a>
-    </div>
+
 
     <!-- Include other relevant user properties here -->
 }
 
 @code {
     private ApplicationUser identityUser;
+    private bool descriptionResponse = false;
+    private bool matchResponse = false;
+    public string description = "";
+    public string matchDescription = "";
 
     protected override async Task OnInitializedAsync()
     {
@@ -59,7 +92,8 @@ else
         }
     }
 
-    public async Task getDescription(string mbti) {
+    public async Task getDescription(string mbti)
+    {
         var client = new HttpClient();
         var combinedMessage = $"Describe about person whose MBTI is {mbti}";
         var request = new HttpRequestMessage
@@ -67,50 +101,112 @@ else
                 Method = HttpMethod.Post,
                 RequestUri = new Uri("https://chatgpt-api7.p.rapidapi.com/ask"),
                 Headers = {
-                    { "X-RapidAPI-Key", "8b1b2714d2msh19c8e1bbadddbffp18f8a6jsn3862b5350c90" },
-                    { "X-RapidAPI-Host", "chatgpt-api7.p.rapidapi.com" },
-                },
+{ "X-RapidAPI-Key", "8b1b2714d2msh19c8e1bbadddbffp18f8a6jsn3862b5350c90" },
+{ "X-RapidAPI-Host", "chatgpt-api7.p.rapidapi.com" },
+},
                 Content = new StringContent("{\r \"query\": \"" + combinedMessage + "\"\r }")
                 {
                     Headers = { ContentType = new MediaTypeHeaderValue("application/json") }
                 }
             };
-        using (var response = await client.SendAsync(request)) 
+        using (var response = await client.SendAsync(request))
         {
             response.EnsureSuccessStatusCode();
             var body = await response.Content.ReadAsStringAsync();
             var json = JObject.Parse(body);
-            var description = json["response"].ToString();
+            description = json["response"].ToString();
+            descriptionResponse = true;
+        }
+    }
+
+    public async Task findMatch(string mbti)
+    {
+        var client = new HttpClient();
+        var combinedMessage = $"What MBTI types match well with {mbti}?";
+        var request = new HttpRequestMessage
+            {
+                Method = HttpMethod.Post,
+                RequestUri = new Uri("https://chatgpt-api7.p.rapidapi.com/ask"),
+                Headers = {
+{ "X-RapidAPI-Key", "8b1b2714d2msh19c8e1bbadddbffp18f8a6jsn3862b5350c90" },
+{ "X-RapidAPI-Host", "chatgpt-api7.p.rapidapi.com" },
+},
+                Content = new StringContent("{\r \"query\": \"" + combinedMessage + "\"\r }")
+                {
+                    Headers = { ContentType = new MediaTypeHeaderValue("application/json") }
+                }
+            };
+        using (var response = await client.SendAsync(request))
+        {
+            response.EnsureSuccessStatusCode();
+            var body = await response.Content.ReadAsStringAsync();
+            var json = JObject.Parse(body);
+            matchDescription = json["response"].ToString();
+            matchResponse = true;
         }
     }
 }
 
 <style scoped>
-.findMbtiButton a, .findMbtiButton button {
-    width: 12%;
-    padding: 10px;
-    margin-top: 10px;
-    color: white;
-    cursor: pointer;
-    font-size: 16px;
-}
+    .profileForm {
+        font-size: 22px;
+    }
 
-.profile-container {
-    width: 80%;
-    margin: 0 auto;
-    background-color: #f9f9f9;
-    border-radius: 15px;
-    padding: 20px;
-    box-shadow: 0 0 10px rgba(0,0,0,0.1);
-}
+    .descriptionBox {
+        font-size: 19px;
+    }
 
-.profile-content h3 {
-    color: #3a3a3a;
-    margin-bottom: 10px;
-}
+    .secondSection {
+        padding-left: 30px;
+        margin-top: 50px;
+        border-left: 3px solid #ccc;
+    }
 
-.profile-content span {
-    color: #555555;
-    font-weight: normal;
-}
+    .secondSection h4 {
+        background-color: #dfdfdf;
+        padding: 10px;
+    }
+
+    .profileInput {
+        margin-top: 9px;
+        font-size: 22px;
+        width: 100%;
+        border-radius: 6px;
+        padding: 10px;
+        background-color: white;
+        border: 2px solid #ccc;
+    }
+
+    .findMbtiButton a,
+    .findMbtiButton button {
+        width: 100%;
+        padding: 10px;
+        margin-top: 10px;
+        cursor: pointer;
+        font-size: 16px;
+        border-radius: 6px;
+    }
+
+    .findMbtiButton a {
+        color: white;
+    }
+
+    .profile-container {
+        width: 80%;
+        margin: 0 auto;
+        background-color: #f9f9f9;
+        border-radius: 15px;
+        padding: 20px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .profile-content h3 {
+        color: #3a3a3a;
+        margin-bottom: 10px;
+    }
+
+    .profile-content span {
+        color: #555555;
+        font-weight: normal;
+    }
 </style>
