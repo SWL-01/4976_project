@@ -26,7 +26,7 @@ else
                         </div>
                         @if (@identityUser.Mbti != null)
                         {
-                            <div class="form-floating mb-3">Mbti: <input type="text" class="profileInput"
+                            <div class="form-floating mb-3">MBTI: <input type="text" class="profileInput"
                                     value="@identityUser.Mbti" disabled></div>
                         }
                         else
@@ -40,7 +40,8 @@ else
                         @identityUser.Mbti like?</button>
                     <button class="btn btn-outline-info" @onclick="() => findMatch(identityUser.Mbti)">Who matches well with
                         @identityUser.Mbti?</button>
-                    <a class="btn btn-warning" href="/findMbti">Test again</a>
+                    <button class="btn btn-outline-warning" @onclick="() => romanticRelationship(identityUser.Mbti)">@identityUser.Mbti's Romantic relationships?</button>
+                    <a class="btn btn-success" href="/findMbti">Test again</a>
                 </div>
             </div>
             @if (descriptionResponse)
@@ -67,7 +68,18 @@ else
                     </section>
                 </div>
             }
-
+            @if (romaticResponse) 
+            {
+                <div class="col-md-6 col-md-offset-2">
+                    <section class="secondSection">
+                        <h4>@identityUser.Mbti's Romantic relationships?</h4>
+                        <hr>
+                        <div class="descriptionBox">
+                            <p>@romanticDescription</p>
+                        </div>
+                    </section>
+                </div>
+            }
         </div>
     </div>
 }
@@ -76,8 +88,10 @@ else
     private ApplicationUser identityUser;
     private bool descriptionResponse = false;
     private bool matchResponse = false;
+    private bool romaticResponse = false;
     public string description = "";
     public string matchDescription = "";
+    public string romanticDescription = "";
 
     protected override async Task OnInitializedAsync()
     {
@@ -94,6 +108,7 @@ else
     {
         descriptionResponse = false;
         matchResponse = false;
+        romaticResponse = false;
         var combinedMessage = $"Describe about person whose MBTI is {mbti}";
         description = await MbtiService.getDescription(combinedMessage);
         descriptionResponse = true;
@@ -103,9 +118,20 @@ else
     {
         descriptionResponse = false;
         matchResponse = false;
+        romaticResponse = false;
         var combinedMessage = $"What MBTI types match well with {mbti}?";
         matchDescription = await MbtiService.findMatch(combinedMessage);
         matchResponse = true;
+    }
+
+    public async Task romanticRelationship(string mbti)
+    {
+        descriptionResponse = false;
+        matchResponse = false;
+        romaticResponse = false;
+        var combinedMessage = $"What is {mbti}'s romantic relationships?";
+        romanticDescription = await MbtiService.findRomanticRelationships(combinedMessage);
+        romaticResponse = true;
     }
 }
 
@@ -125,7 +151,7 @@ else
     }
 
     .secondSection h4 {
-        background-color: #dfdfdf;
+        background-color: #ddc4ea;
         padding: 10px;
     }
 

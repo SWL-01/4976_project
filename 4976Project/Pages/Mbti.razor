@@ -25,18 +25,19 @@
                     4. <input @bind="message4" /> <br>
                     5. <input @bind="message5" /> <br> <br>
 
-                    <button @onclick="needHelp" class="btn btn-danger">Need Help?</button>
-                    <button @onclick="SendMessage" class="btn btn-warning">Test</button>
+                    <button @onclick="needHelp" id="needHelp" class="btn btn-outline-danger">Need Help?</button>
+                    <button @onclick="SendMessage" id="testBtn" class="btn btn-success">Test</button>
                 </div>
             }
             @if (messages.Count > 0) {
                 <div class="messages">
                     @for (int i = 0; i < messages.Count; i++) {
                         @if (i % 2 == 0) {
-                            <div class="question">Your MBTI Type: <b>@messages[i]</b></div>
+                            <div class="question"><span class="titles">Your MBTI Type:</span> <b>@messages[i]</b></div>
                         } else {
-                            <div class="response">Description: @messages[i]</div>
+                            <div class="response"><span class="titles">Description:</span> @messages[i]</div>
                             <div>
+                                <hr>
                                 <p>If this sounds like your MBTI, click <b>Save</b>. Otherwise, please describe more about you.</p>
                                 <button @onclick="saveMbtiResults" class="btn btn-success">Save</button>
                                 <button @onclick="HandleNoClick" class="btn btn-danger">No</button>
@@ -168,6 +169,13 @@
 }
 
 <style scoped>
+#needHelp {
+    width: 80%;
+    margin-left: 18px;
+    padding: 10px;
+    margin-top: 10px;
+    font-size: 16px;
+}
 .clearfix::after {
     content: "";
     display: table;
@@ -180,11 +188,19 @@
     background-color: #b1cfee;
     padding: 5px;
 }
+.titles {
+    background-color: #b1cfee;
+    padding: 5px;
+    border-radius: 6px;
+}
 .guide {
     margin-top: 30px;
     margin-left: 20px;
     border: 2px solid #b1cfee;
     padding: 20px;
+}
+.question, .response {
+    margin-top: 10px;
 }
 .guide button {
     float: right;
@@ -204,7 +220,7 @@
     margin: 5px 0;
     box-sizing: border-box;
 }
-.textMessage button {
+#testBtn {
     width: 80%;
     margin-left: 18px;
     padding: 10px;
@@ -224,7 +240,7 @@
     background-color: #f8f9fa;
     padding: 10px;
     border-radius: 5px;
-    font-size: 16px;
+    font-size: 17px;
 }
 
 .messages p {

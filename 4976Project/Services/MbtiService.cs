@@ -120,5 +120,29 @@ namespace _4976Project.Services
                 return json["response"].ToString();
             }
         }
+
+        public async Task<string> findRomanticRelationships(string combinedMessage) {
+            var client = new HttpClient();
+            var request = new HttpRequestMessage
+            {
+                Method = HttpMethod.Post,
+                RequestUri = new Uri("https://chatgpt-api7.p.rapidapi.com/ask"),
+                Headers = {
+                { "X-RapidAPI-Key", "8b1b2714d2msh19c8e1bbadddbffp18f8a6jsn3862b5350c90" },
+                { "X-RapidAPI-Host", "chatgpt-api7.p.rapidapi.com" },
+                },
+                Content = new StringContent("{\r \"query\": \"" + combinedMessage + "\"\r }")
+                {
+                    Headers = { ContentType = new MediaTypeHeaderValue("application/json") }
+                }
+            };
+            using (var response = await client.SendAsync(request))
+            {
+                response.EnsureSuccessStatusCode();
+                var body = await response.Content.ReadAsStringAsync();
+                var json = JObject.Parse(body);
+                return json["response"].ToString();
+            }
+        }
     }
 }
