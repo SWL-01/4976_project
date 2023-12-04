@@ -34,6 +34,10 @@ else
             }
         </tbody>
     </table>
+
+    <div class="findMbtiButton">
+        <a class="btn btn-warning" href="/findMbti">Find My MBTI!</a>
+    </div>
     </div>
 }
 
@@ -45,3 +49,14 @@ else
         users = await MbtiService.GetAllUsers();
     }
 }
+
+<style scoped>
+.findMbtiButton a {
+    width: 12%;
+    padding: 10px;
+    margin-top: 10px;
+    color: white;
+    cursor: pointer;
+    font-size: 16px;
+}
+</style>

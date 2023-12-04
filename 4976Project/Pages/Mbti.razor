@@ -1,5 +1,6 @@
 ﻿@page "/findMbti"
 @inject _4976Project.Services.MbtiService MbtiService
+@inject NavigationManager NavigationManager
 @using Newtonsoft.Json;
 @using System.Text;
 @using System.Net.Http.Headers;
@@ -15,27 +16,34 @@
     <div class="row">
         <h4>Enter 5 words you say often or things that can describe your personality</h4> <br><br>
         <div class="col-4">
-            <div class="textMessage">
-                @* <input @bind="message" /> *@
-                1. <input @bind="message1" /> <br>
-                2. <input @bind="message2" /> <br>
-                3. <input @bind="message3" /> <br>
-                4. <input @bind="message4" /> <br>
-                5. <input @bind="message5" /> <br> <br>
-                <button @onclick="SendMessage" class="btn btn-warning">Send</button>
+            <div class="messages">
+                @for (int i = 0; i < messages.Count; i++) {
+                    @if (i % 2 == 0) {
+                        <div class="question">Your MBTI Type: <b>@messages[i]</b></div>
+                    } else {
+                        <div class="response">Description: @messages[i]</div>
+                        <div>
+                            <p>If this sounds like your MBTI, click <b>Save</b>. Otherwise, please describe more about you.</p>
+                            <button @onclick="saveMbtiResults" class="btn btn-success">Save</button>
+                            <button @onclick="HandleNoClick" class="btn btn-danger">No</button>
+                        </div>
+                    }
+                }
             </div>
+            @if (!responseReceived) {
+                <div class="textMessage">
+                    @* <input @bind="message" /> *@
+                    1. <input @bind="message1" /> <br>
+                    2. <input @bind="message2" /> <br>
+                    3. <input @bind="message3" /> <br>
+                    4. <input @bind="message4" /> <br>
+                    5. <input @bind="message5" /> <br> <br>
+                    <button @onclick="SendMessage" class="btn btn-warning">Send</button>
+                </div>
+            }
             <br>
             <div>
                  <p class="testing-message">@testing</p>
-            </div>
-            <div class="messages">
-                @if (messages.Count > 0) {
-                    <br>
-                    <p>Your MBTI type: <b>@MbtiService.ExtractMBTITypes(messages[0]).FirstOrDefault()</b></p>
-                    <div class="response">Description: @messages[0]</div>
-                    <p>If this sounds like your MBTI, click <b>Save</b>. Otherwise, please describe more about you.</p>
-                    <button @onclick="saveMbtiResults" class="btn btn-success">Save</button>
-                }
             </div>
         </div>
         <div class="col-4">
@@ -44,6 +52,7 @@
 </div>
 
 @code {
+    private bool responseReceived = false;
     @* public string message; *@
     public string message1;
     public string message2;
@@ -93,12 +102,20 @@
             response.EnsureSuccessStatusCode();
             var body = await response.Content.ReadAsStringAsync();
             var json = JObject.Parse(body);
-            messages.Add(json["response"].ToString());
+            var mbtiType = MbtiService.ExtractMBTITypes(json["response"].ToString()).FirstOrDefault();
+            if (mbtiDescriptions.TryGetValue(mbtiType, out string description)) {
+                messages.Add(mbtiType);
+                messages.Add(description);
+            } else {
+                messages.Add("MBTI Type not found.");
+            }
+            @* messages.Add(json["response"].ToString()); *@
             message1 = string.Empty;
             message2 = string.Empty;
             message3 = string.Empty;
             message4 = string.Empty;
             message5 = string.Empty;
+            responseReceived = true;
             StateHasChanged();
         }
     }
@@ -106,7 +123,39 @@
     public async Task saveMbtiResults() {
         var mbtiType = MbtiService.ExtractMBTITypes(messages[0]).FirstOrDefault();
         await MbtiService.SaveMbtiResults(mbtiType);
+        NavigationManager.NavigateTo("/profile");
     }
+
+    private void HandleNoClick()
+    {
+        // Reset the state to show the input fields again
+        responseReceived = false;
+        // Optionally clear previous messages or keep them
+        messages.Clear(); // Uncomment this line if you want to clear previous messages
+        // Update UI
+        StateHasChanged();
+    }
+
+    Dictionary<string, string> mbtiDescriptions = new Dictionary<string, string>
+    {
+        { "ISTJ", "ISTJs are responsible organizers, driven to create and enforce order within systems and institutions. They are detail-oriented and have a strong focus on tradition and loyalty." },
+        { "ISFJ", "ISFJs are dedicated caretakers, motivated by duty and their desire to help others. They are meticulous and thoughtful, valuing stability and security." },
+        { "INFJ", "INFJs are insightful visionaries, driven by their principles and ideals. They are complex, intuitive, and deeply empathetic, often feeling misunderstood." },
+        { "INTJ", "INTJs are strategic innovators, with a drive for efficiency and a clear vision of what they believe is best for the future. They are independent and decisive." },
+        { "ISTP", "ISTPs are practical explorers, excited by hands-on learning and new experiences. They are adaptable and resourceful, preferring to work autonomously." },
+        { "ISFP", "ISFPs are charming artists, inspired by connections with people and ideas. They enjoy expressing themselves creatively and seek harmony in their environment." },
+        { "INFP", "INFPs are imaginative idealists, guided by their own core values and beliefs. They are open-minded and compassionate, often feeling a deep sense of purpose." },
+        { "INTP", "INTPs are innovative analysts, curious about systems and how things work. They are abstract thinkers, valuing logic and knowledge over emotion." },
+        { "ESTP", "ESTPs are energetic problem-solvers, eager to take quick action. They are spontaneous, competitive, and social, often enjoying physical activities and challenges." },
+        { "ESFP", "ESFPs are enthusiastic improvisers, enjoying life at the moment and bringing excitement into others' lives. They are playful, spontaneous, and resourceful." },
+        { "ENFP", "ENFPs are imaginative motivators, enthusiastic and open-minded, always seeing possibilities. They are charismatic, expressive, and drawn to new ideas and experiences." },
+        { "ENTP", "ENTPs are enterprising explorers, always questioning and pondering the world around them. They are inventive, enthusiastic, and enjoy debating ideas." },
+        { "ESTJ", "ESTJs are efficient organizers, leading with decisiveness and clear rules. They value predictability, order, and respect for authority and tradition." },
+        { "ESFJ", "ESFJs are conscientious helpers, sociable and eager to please. They seek harmony in their environment and work diligently to take care of others." },
+        { "ENFJ", "ENFJs are compassionate facilitators, sensitive to the needs of others. They are persuasive, organized, and drawn to supporting others and nurturing their potential." },
+        { "ENTJ", "ENTJs are commanding strategists, highly rational and assertive. They are driven to organize and are often in pursuit of efficiency and long-term planning." }
+    };
+
 }
 
 <style scoped>
@@ -147,9 +196,7 @@
     padding: 10px;
     margin-top: 10px;
     border: none;
-    background-color: #28a745;
     color: white;
-    cursor: pointer;
     font-size: 16px;
 }
 </style>

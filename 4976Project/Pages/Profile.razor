@@ -19,7 +19,9 @@ else
     } else {
         <p>Mbti: Not Set</p>
     }
-    <a class="btn btn-warning" href="/findMbti">Test again</a>
+    <div class="findMbtiButton">
+        <a class="btn btn-warning" href="/findMbti">Test again</a>
+    </div>
     <!-- Include other relevant user properties here -->
 }
 
@@ -37,3 +39,14 @@ else
         }
     }
 }
+
+<style scoped>
+.findMbtiButton a {
+    width: 12%;
+    padding: 10px;
+    margin-top: 10px;
+    color: white;
+    cursor: pointer;
+    font-size: 16px;
+}
+</style>
