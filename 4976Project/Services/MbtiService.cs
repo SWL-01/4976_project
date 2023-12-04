@@ -1,10 +1,8 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components.Authorization;
 using System.Text.RegularExpressions;
 using _4976Project.Data;
+using _4976Project.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace _4976Project.Services
 {
@@ -38,6 +36,11 @@ namespace _4976Project.Services
                 // Save changes to database
                 await _context.SaveChangesAsync();
             }
+        }
+
+        public async Task<List<ApplicationUser>> GetAllUsers()
+        {
+            return await _context.Users.ToListAsync();
         }
     }
 }

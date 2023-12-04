@@ -1,0 +1,47 @@
+@page "/getMbti"
+@using _4976Project.Data
+@using _4976Project.Services
+@using _4976Project.Models
+@inject _4976Project.Services.MbtiService MbtiService
+
+<PageTitle>Show MBTI</PageTitle>
+
+@if (users == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <h1>MBTI Table</h1>
+
+    <hr />
+    
+    <div class="table-responsive">
+    <table class="table table-hover table-striped">
+        <thead class="table-dark">
+            <tr>
+                <th>Email</th>
+                <th>MBTI</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var user in users)
+            {
+                <tr>
+                    <td>@user.Email</td>
+                    <td>@user.Mbti</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    </div>
+}
+
+@code {
+    private List<ApplicationUser> users;
+
+    protected override async Task OnInitializedAsync()
+    {
+        users = await MbtiService.GetAllUsers();
+    }
+}

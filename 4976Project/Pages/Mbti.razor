@@ -1,4 +1,4 @@
-﻿@page "/getMbti"
+﻿@page "/findMbti"
 @inject _4976Project.Services.MbtiService MbtiService
 @using Newtonsoft.Json;
 @using System.Text;
@@ -7,11 +7,13 @@
 
 <PageTitle>Find MBTI</PageTitle>
 
+<h1>Find MBTI</h1>
+
+<hr />
+
 <div class="container">
     <div class="row">
-        <div class="col-4">
-            <p>@testing</p>
-        </div>
+        <h4>Enter 5 words you say often or things that can describe your personality</h4> <br><br>
         <div class="col-4">
             <div class="textMessage">
                 @* <input @bind="message" /> *@
@@ -20,7 +22,11 @@
                 3. <input @bind="message3" /> <br>
                 4. <input @bind="message4" /> <br>
                 5. <input @bind="message5" /> <br> <br>
-                <button @onclick="SendMessage">Send</button>
+                <button @onclick="SendMessage" class="btn btn-warning">Send</button>
+            </div>
+            <br>
+            <div>
+                 <p class="testing-message">@testing</p>
             </div>
             <div class="messages">
                 @if (messages.Count > 0) {
@@ -28,7 +34,7 @@
                     <p>Your MBTI type: <b>@MbtiService.ExtractMBTITypes(messages[0]).FirstOrDefault()</b></p>
                     <div class="response">Description: @messages[0]</div>
                     <p>If this sounds like your MBTI, click <b>Save</b>. Otherwise, please describe more about you.</p>
-                    <button @onclick="saveMbtiResults">Save</button>
+                    <button @onclick="saveMbtiResults" class="btn btn-success">Save</button>
                 }
             </div>
         </div>
@@ -57,6 +63,15 @@
 
     public async Task SendMessage()
     {
+        if (string.IsNullOrEmpty(message1) || 
+            string.IsNullOrEmpty(message2) ||
+            string.IsNullOrEmpty(message3) ||
+            string.IsNullOrEmpty(message4) ||
+            string.IsNullOrEmpty(message5))
+        {
+            testing = "Please enter all five inputs.";
+            return;
+        }
         var client = new HttpClient();
         var combinedMessage = $"Detect my personality based on mbti and these messages '{message1}', '{message2}', '{message3}', '{message4}', and '{message5}', what is this persons's MBTI type? Write final answer like you are istp or whatever.";
         var request = new HttpRequestMessage
@@ -93,3 +108,48 @@
         await MbtiService.SaveMbtiResults(mbtiType);
     }
 }
+
+<style scoped>
+.textMessage input {
+    width: 80%;
+    padding: 10px;
+    margin: 5px 0;
+    box-sizing: border-box;
+}
+.textMessage button {
+    width: 30%;
+    padding: 10px;
+    margin-top: 10px;
+    color: white;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.testing-message {
+    color: red;
+    font-size: 18px;
+    margin-bottom: 10px;
+}
+
+.messages {
+    background-color: #f8f9fa;
+    padding: 10px;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+.messages p {
+    margin: 5px 0;
+}
+
+.messages button {
+    width: 30%;
+    padding: 10px;
+    margin-top: 10px;
+    border: none;
+    background-color: #28a745;
+    color: white;
+    cursor: pointer;
+    font-size: 16px;
+}
+</style>
