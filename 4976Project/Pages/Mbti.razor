@@ -14,7 +14,7 @@
 
 <div class="container">
     <div class="row">
-        <h4>Enter 5 words you say often or things that can describe your personality</h4> <br><br>
+        <h4>Enter 5 things that can describe your personality or words you say often</h4> <br><br>
         <div class="col-4">
             @if (messages.Count > 0) {
                 <div class="messages">
@@ -35,13 +35,12 @@
 
             @if (!responseReceived) {
                 <div class="textMessage">
-                    @* <input @bind="message" /> *@
                     1. <input @bind="message1" /> <br>
                     2. <input @bind="message2" /> <br>
                     3. <input @bind="message3" /> <br>
                     4. <input @bind="message4" /> <br>
                     5. <input @bind="message5" /> <br> <br>
-                    <button @onclick="SendMessage" class="btn btn-warning">Send</button>
+                    <button @onclick="SendMessage" class="btn btn-warning">Test</button>
                 </div>
             }
             <br>
@@ -56,7 +55,6 @@
 
 @code {
     private bool responseReceived = false;
-    @* public string message; *@
     public string message1;
     public string message2;
     public string message3;
@@ -84,43 +82,22 @@
             testing = "Please enter all five inputs.";
             return;
         }
-        var client = new HttpClient();
         var combinedMessage = $"Detect my personality based on mbti and these messages '{message1}', '{message2}', '{message3}', '{message4}', and '{message5}', what is this persons's MBTI type? Write final answer like you are istp or whatever.";
-        var request = new HttpRequestMessage
-            {
-                Method = HttpMethod.Post,
-                RequestUri = new Uri("https://chatgpt-api7.p.rapidapi.com/ask"),
-                Headers = {
-                    { "X-RapidAPI-Key", "8b1b2714d2msh19c8e1bbadddbffp18f8a6jsn3862b5350c90" },
-                    { "X-RapidAPI-Host", "chatgpt-api7.p.rapidapi.com" },
-                },
-                Content = new StringContent("{\r \"query\": \"" + combinedMessage + "\"\r }")
-                {
-                    Headers = { ContentType = new MediaTypeHeaderValue("application/json") }
-                }
-            };
-        using (var response = await client.SendAsync(request))
-        {
-            messages = new List<string>();
-            response.EnsureSuccessStatusCode();
-            var body = await response.Content.ReadAsStringAsync();
-            var json = JObject.Parse(body);
-            var mbtiType = MbtiService.ExtractMBTITypes(json["response"].ToString()).FirstOrDefault();
-            if (mbtiDescriptions.TryGetValue(mbtiType, out string description)) {
+        var mbtiType = await MbtiService.SendMessage(combinedMessage);
+        messages = new List<string>();
+        if (mbtiDescriptions.TryGetValue(mbtiType, out string description)) {
                 messages.Add(mbtiType);
-                messages.Add(description);
-            } else {
-                messages.Add("MBTI Type not found.");
-            }
-            @* messages.Add(json["response"].ToString()); *@
-            message1 = string.Empty;
-            message2 = string.Empty;
-            message3 = string.Empty;
-            message4 = string.Empty;
-            message5 = string.Empty;
-            responseReceived = true;
-            StateHasChanged();
+            messages.Add(description);
+        } else {
+            messages.Add("MBTI Type not found.");
         }
+        message1 = string.Empty;
+        message2 = string.Empty;
+        message3 = string.Empty;
+        message4 = string.Empty;
+        message5 = string.Empty;
+        responseReceived = true;
+        StateHasChanged();
     }
 
     public async Task saveMbtiResults() {

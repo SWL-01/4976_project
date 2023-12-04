@@ -3,6 +3,7 @@
 @using _4976Project.Models
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject UserManager<ApplicationUser> UserManager
+@inject _4976Project.Services.MbtiService MbtiService
 @using System.Net.Http.Headers;
 @using Newtonsoft.Json.Linq;
 
@@ -94,56 +95,20 @@ else
 
     public async Task getDescription(string mbti)
     {
-        var client = new HttpClient();
+        descriptionResponse = false;
+        matchResponse = false;
         var combinedMessage = $"Describe about person whose MBTI is {mbti}";
-        var request = new HttpRequestMessage
-            {
-                Method = HttpMethod.Post,
-                RequestUri = new Uri("https://chatgpt-api7.p.rapidapi.com/ask"),
-                Headers = {
-{ "X-RapidAPI-Key", "8b1b2714d2msh19c8e1bbadddbffp18f8a6jsn3862b5350c90" },
-{ "X-RapidAPI-Host", "chatgpt-api7.p.rapidapi.com" },
-},
-                Content = new StringContent("{\r \"query\": \"" + combinedMessage + "\"\r }")
-                {
-                    Headers = { ContentType = new MediaTypeHeaderValue("application/json") }
-                }
-            };
-        using (var response = await client.SendAsync(request))
-        {
-            response.EnsureSuccessStatusCode();
-            var body = await response.Content.ReadAsStringAsync();
-            var json = JObject.Parse(body);
-            description = json["response"].ToString();
-            descriptionResponse = true;
-        }
+        description = await MbtiService.getDescription(combinedMessage);
+        descriptionResponse = true;
     }
 
     public async Task findMatch(string mbti)
     {
-        var client = new HttpClient();
+        descriptionResponse = false;
+        matchResponse = false;
         var combinedMessage = $"What MBTI types match well with {mbti}?";
-        var request = new HttpRequestMessage
-            {
-                Method = HttpMethod.Post,
-                RequestUri = new Uri("https://chatgpt-api7.p.rapidapi.com/ask"),
-                Headers = {
-{ "X-RapidAPI-Key", "8b1b2714d2msh19c8e1bbadddbffp18f8a6jsn3862b5350c90" },
-{ "X-RapidAPI-Host", "chatgpt-api7.p.rapidapi.com" },
-},
-                Content = new StringContent("{\r \"query\": \"" + combinedMessage + "\"\r }")
-                {
-                    Headers = { ContentType = new MediaTypeHeaderValue("application/json") }
-                }
-            };
-        using (var response = await client.SendAsync(request))
-        {
-            response.EnsureSuccessStatusCode();
-            var body = await response.Content.ReadAsStringAsync();
-            var json = JObject.Parse(body);
-            matchDescription = json["response"].ToString();
-            matchResponse = true;
-        }
+        matchDescription = await MbtiService.findMatch(combinedMessage);
+        matchResponse = true;
     }
 }
 
