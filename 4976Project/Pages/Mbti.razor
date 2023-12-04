@@ -14,8 +14,21 @@
 
 <div class="container">
     <div class="row">
-        <h4>Enter 5 things that can describe your personality or words you say often</h4> <br><br>
         <div class="col-4">
+                    <h4>Enter 5 things that can describe your personality or words you say often</h4> <br>
+
+            @if (!responseReceived) {
+                <div class="textMessage">
+                    1. <input @bind="message1" /> <br>
+                    2. <input @bind="message2" /> <br>
+                    3. <input @bind="message3" /> <br>
+                    4. <input @bind="message4" /> <br>
+                    5. <input @bind="message5" /> <br> <br>
+
+                    <button @onclick="needHelp" class="btn btn-danger">Need Help?</button>
+                    <button @onclick="SendMessage" class="btn btn-warning">Test</button>
+                </div>
+            }
             @if (messages.Count > 0) {
                 <div class="messages">
                     @for (int i = 0; i < messages.Count; i++) {
@@ -32,29 +45,35 @@
                     }
                 </div>
             }
-
-            @if (!responseReceived) {
-                <div class="textMessage">
-                    1. <input @bind="message1" /> <br>
-                    2. <input @bind="message2" /> <br>
-                    3. <input @bind="message3" /> <br>
-                    4. <input @bind="message4" /> <br>
-                    5. <input @bind="message5" /> <br> <br>
-                    <button @onclick="SendMessage" class="btn btn-warning">Test</button>
-                </div>
-            }
             <br>
             <div>
                  <p class="testing-message">@testing</p>
             </div>
         </div>
-        <div class="col-4">
-        </div>
+        @if (helpNeeded) {
+            <div class="col-md-6 col-md-offset-2">
+                <div class="guide clearfix">
+                    <h5>Here are some examples:</h5>
+                    <p>1. I often make a backup plan for a backup plan.</p>
+                    <p>2. I regularly make new friends.</p>
+                    <p>3. I am not too interested in discussing various interpretations and analyses of creative works.</p>
+                    <p>4. I am more inclined to follow your head than your heart.</p>
+                    <p>5. I enjoy participating in group activities.</p>
+                    <p>6. Let's just do it now and see what happens.</p>
+                    <p>7. I understand how you feel.</p>
+                    <p>8. Let's stick to the plan.</p>
+                    <p>9. This is the rule. We should follow it.</p>
+                    <p>10. How can I help you?</p>
+                    <button @onclick="noHelp" class="btn btn-outline-primary">Got it, thanks</button>
+                </div>
+            </div>
+        }
     </div>
 </div>
 
 @code {
     private bool responseReceived = false;
+    private bool helpNeeded = false;
     public string message1;
     public string message2;
     public string message3;
@@ -100,6 +119,16 @@
         StateHasChanged();
     }
 
+    public async Task needHelp()
+    {
+        helpNeeded = true;
+    }
+
+    public async Task noHelp()
+    {
+        helpNeeded = false;
+    }
+
     public async Task saveMbtiResults() {
         var mbtiType = MbtiService.ExtractMBTITypes(messages[0]).FirstOrDefault();
         await MbtiService.SaveMbtiResults(mbtiType);
@@ -139,6 +168,36 @@
 }
 
 <style scoped>
+.clearfix::after {
+    content: "";
+    display: table;
+    clear: both;
+}
+.col-md-6.col-md-offset-2 p {
+    margin-bottom: 8px;
+}
+.col-md-6.col-md-offset-2 h5 {
+    background-color: #b1cfee;
+    padding: 5px;
+}
+.guide {
+    margin-top: 30px;
+    margin-left: 20px;
+    border: 2px solid #b1cfee;
+    padding: 20px;
+}
+.guide button {
+    float: right;
+}
+.needHelp {
+    display: block;
+}
+.container {
+    margin-top: 50px;
+}
+.textMessage {
+    margin-top: 0;
+}
 .textMessage input {
     width: 80%;
     padding: 10px;
@@ -146,7 +205,8 @@
     box-sizing: border-box;
 }
 .textMessage button {
-    width: 30%;
+    width: 80%;
+    margin-left: 18px;
     padding: 10px;
     margin-top: 10px;
     color: white;
