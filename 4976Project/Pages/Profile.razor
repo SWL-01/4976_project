@@ -3,6 +3,8 @@
 @using _4976Project.Models
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject UserManager<ApplicationUser> UserManager
+@using System.Net.Http.Headers;
+@using Newtonsoft.Json.Linq;
 
 <h1>User Profile</h1>
 <hr />
@@ -13,6 +15,22 @@
 }
 else
 {
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4">
+                <section>
+                    <form>
+                        <div class="form-floating mb-3">Name: @identityUser.UserName</div>
+                            @if (@identityUser.Mbti != null) {
+                                <div class="form-floating mb-3">Mbti: @identityUser.Mbti</div>
+                            } else {
+                                <div class="form-floating mb-3">Mbti: Not Set</div>
+                            }
+                    </form>
+                </section>
+            </div>
+        </div>
+    </div>
     <p>Name: @identityUser.UserName</p>
     @if (@identityUser.Mbti != null) {
         <p>Mbti: @identityUser.Mbti</p>
@@ -20,8 +38,10 @@ else
         <p>Mbti: Not Set</p>
     }
     <div class="findMbtiButton">
+        <button class="btn btn-primary" onclick="getDescription(@identityUser.Mbti)">What is @identityUser.Mbti like?</button>
         <a class="btn btn-warning" href="/findMbti">Test again</a>
     </div>
+
     <!-- Include other relevant user properties here -->
 }
 
@@ -32,21 +52,65 @@ else
     {
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
         var user = authState.User;
-        
+
         if (user.Identity.IsAuthenticated)
         {
             identityUser = await UserManager.FindByNameAsync(user.Identity.Name);
         }
     }
+
+    public async Task getDescription(string mbti) {
+        var client = new HttpClient();
+        var combinedMessage = $"Describe about person whose MBTI is {mbti}";
+        var request = new HttpRequestMessage
+            {
+                Method = HttpMethod.Post,
+                RequestUri = new Uri("https://chatgpt-api7.p.rapidapi.com/ask"),
+                Headers = {
+                    { "X-RapidAPI-Key", "8b1b2714d2msh19c8e1bbadddbffp18f8a6jsn3862b5350c90" },
+                    { "X-RapidAPI-Host", "chatgpt-api7.p.rapidapi.com" },
+                },
+                Content = new StringContent("{\r \"query\": \"" + combinedMessage + "\"\r }")
+                {
+                    Headers = { ContentType = new MediaTypeHeaderValue("application/json") }
+                }
+            };
+        using (var response = await client.SendAsync(request)) 
+        {
+            response.EnsureSuccessStatusCode();
+            var body = await response.Content.ReadAsStringAsync();
+            var json = JObject.Parse(body);
+            var description = json["response"].ToString();
+        }
+    }
 }
 
 <style scoped>
-.findMbtiButton a {
+.findMbtiButton a, .findMbtiButton button {
     width: 12%;
     padding: 10px;
     margin-top: 10px;
     color: white;
     cursor: pointer;
     font-size: 16px;
+}
+
+.profile-container {
+    width: 80%;
+    margin: 0 auto;
+    background-color: #f9f9f9;
+    border-radius: 15px;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+.profile-content h3 {
+    color: #3a3a3a;
+    margin-bottom: 10px;
+}
+
+.profile-content span {
+    color: #555555;
+    font-weight: normal;
 }
 </style>
