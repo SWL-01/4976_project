@@ -51,7 +51,7 @@
                  <p class="testing-message">@testing</p>
             </div>
         </div>
-        @if (helpNeeded) {
+        @if (helpNeeded && messages.Count <= 0) {
             <div class="col-md-6 col-md-offset-2">
                 <div class="guide clearfix">
                     <h5>Here are some examples:</h5>
@@ -69,6 +69,12 @@
                 </div>
             </div>
         }
+        @if (messages.Count > 0) {
+            <div class="col-md-6 col-md-offset-2">
+                <img src="mbti_description.png" alt="" id="mbtiDescImg">
+            </div>
+        }
+
     </div>
 </div>
 
@@ -169,6 +175,10 @@
 }
 
 <style scoped>
+#mbtiDescImg {
+    margin-top: 80px;
+    margin-left: 20px;
+}
 #needHelp {
     width: 80%;
     margin-left: 18px;
