@@ -31,18 +31,26 @@ else
                         }
                         else
                         {
-                            <div class="form-floating mb-3">Mbti: Not Set</div>
+                            <div class="form-floating mb-3">MBTI: <input type="text" class="profileInput"
+                                    value="Not Set" disabled></div>
                         }
                     </form>
                 </section>
-                <div class="findMbtiButton">
-                    <button class="btn btn-outline-primary" @onclick="() => getDescription(identityUser.Mbti)">What is
-                        @identityUser.Mbti like?</button>
-                    <button class="btn btn-outline-info" @onclick="() => findMatch(identityUser.Mbti)">Who matches well with
-                        @identityUser.Mbti?</button>
-                    <button class="btn btn-outline-warning" @onclick="() => romanticRelationship(identityUser.Mbti)">@identityUser.Mbti's Romantic relationships?</button>
-                    <a class="btn btn-success" href="/findMbti">Test again</a>
-                </div>
+                @if (@identityUser.Mbti != null) {
+                    <div class="findMbtiButton">
+                        <button class="btn btn-outline-primary" @onclick="() => getDescription(identityUser.Mbti)">What is
+                            @identityUser.Mbti like?</button>
+                        <button class="btn btn-outline-info" @onclick="() => findMatch(identityUser.Mbti)">Who matches well with
+                            @identityUser.Mbti?</button>
+                        <button class="btn btn-outline-warning" @onclick="() => romanticRelationship(identityUser.Mbti)">@identityUser.Mbti's Romantic relationships?</button>
+                        <a class="btn btn-success" href="/findMbti">Test again</a>
+                    </div>
+                }
+                else {
+                    <div class="findMbtiButton">
+                        <a class="btn btn-success" href="/findMbti">Test MBTI first to play around!</a>
+                    </div>
+                }
             </div>
             @if (descriptionResponse)
             {
@@ -142,6 +150,7 @@ else
 
     .descriptionBox {
         font-size: 19px;
+        margin-bottom: 100px;
     }
 
     .secondSection {
