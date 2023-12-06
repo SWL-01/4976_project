@@ -16,23 +16,33 @@ else
     <h1>MBTI Data</h1>
     <hr />
 
-    <RadzenDataGrid TItem="ApplicationUser" Data="@users" 
-                    ColumnWidth="200px" 
-                    AllowSorting="true" 
-                    AllowPaging="true" 
-                    PageSize="10">
+    <h5 class="dataTypes">Table</h5>
+    <RadzenDataGrid TItem="ApplicationUser" Data="@users" ColumnWidth="200px" AllowSorting="true" AllowPaging="true"
+        PageSize="10">
         <Columns>
-            <RadzenDataGridColumn TItem="ApplicationUser" Property="Email" Title="Email" Sortable="true" />
-            <RadzenDataGridColumn TItem="ApplicationUser" Property="Mbti" Title="MBTI" Sortable="true" />
+            @* <RadzenDataGridColumn TItem="ApplicationUser" Property="Email" Title="Email" Sortable="true" />
+            <RadzenDataGridColumn TItem="ApplicationUser" Property="Mbti" Title="MBTI" Sortable="true" /> *@
+            <RadzenDataGridColumn TItem="ApplicationUser" Property="Email" Title="Email" Sortable="true">
+                <HeaderTemplate>
+                    <div style="font-weight: bold;">Email</div>
+                </HeaderTemplate>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="ApplicationUser" Property="Mbti" Title="MBTI" Sortable="true">
+                <HeaderTemplate>
+                    <div style="font-weight: bold;">MBTI</div>
+                </HeaderTemplate>
+            </RadzenDataGridColumn>
         </Columns>
     </RadzenDataGrid>
+    <hr />
+    <h5 class="dataTypes">Pie Chart</h5>
     <RadzenChart>
         <RadzenPieSeries Data="@series" CategoryProperty="Category" ValueProperty="Value">
         </RadzenPieSeries>
     </RadzenChart>
     <div class="findMbtiButton">
-    <a class="btn btn-success" href="/findMbti">Find My MBTI!</a>
-</div>
+        <a class="btn btn-success" href="/findMbti">Find My MBTI!</a>
+    </div>
 }
 
 @code {
@@ -68,5 +78,9 @@ else
         color: white;
         cursor: pointer;
         font-size: 16px;
+    }
+    .dataTypes {
+        font-size: 20px;
+        padding: 5px;
     }
 </style>
