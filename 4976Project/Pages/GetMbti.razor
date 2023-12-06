@@ -18,7 +18,7 @@ else
 
     <h5 class="dataTypes">Table</h5>
     <RadzenDataGrid TItem="ApplicationUser" Data="@users" ColumnWidth="200px" AllowSorting="true" AllowPaging="true"
-        PageSize="10">
+        PageSize="5">
         <Columns>
             @* <RadzenDataGridColumn TItem="ApplicationUser" Property="Email" Title="Email" Sortable="true" />
             <RadzenDataGridColumn TItem="ApplicationUser" Property="Mbti" Title="MBTI" Sortable="true" /> *@
@@ -78,6 +78,7 @@ else
         color: white;
         cursor: pointer;
         font-size: 16px;
+        margin-bottom: 100px;
     }
     .dataTypes {
         font-size: 20px;
