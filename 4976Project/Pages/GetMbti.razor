@@ -64,7 +64,7 @@ else
     {
         users = await MbtiService.GetAllUsers();
 
-        var mbtiTypesToInclude = new List<string> { "INTJ", "INFP", "ENTP", "ESFJ", "INFJ", "ENFP" };
+        var mbtiTypesToInclude = new List<string> { "INTJ", "INFP", "ENTP", "ESFJ", "INFJ", "ENFP", "ISTJ", "ISFJ", "ESTJ", "ESFP", "ISTP", "ISFP", "ESTP", "ENFJ", "INTP", "ENTJ" };
 
         series = users
         .Where(u => mbtiTypesToInclude.Contains(u.Mbti))
