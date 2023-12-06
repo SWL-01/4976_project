@@ -3,6 +3,7 @@
 @using _4976Project.Services
 @using _4976Project.Models
 @inject _4976Project.Services.MbtiService MbtiService
+@using Radzen.Blazor
 
 <PageTitle>Show MBTI</PageTitle>
 
@@ -13,9 +14,8 @@
 else
 {
     <h1>MBTI Table</h1>
-
     <hr />
-    
+
     <div class="table-responsive">
     <table class="table table-hover table-striped">
         <thead class="table-dark">
@@ -26,37 +26,67 @@ else
         </thead>
         <tbody>
             @foreach (var user in users)
-            {
-                <tr>
-                    <td>@user.Email</td>
-                    <td>@user.Mbti</td>
-                </tr>
-            }
-        </tbody>
-    </table>
+                {
+                    <tr>
+                        <td>@user.Email</td>
+                        <td>@user.Mbti</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
 
     <div class="findMbtiButton">
         <a class="btn btn-success" href="/findMbti">Find My MBTI!</a>
     </div>
-    </div>
+
+
+    @if (series == null)
+    {
+        <p><em>No series data...</em></p>
+    }
+    else
+    {
+        <RadzenChart>
+          <RadzenPieSeries Data="@series" 
+                           CategoryProperty="Category" 
+                           ValueProperty="Value" >
+          </RadzenPieSeries>
+        </RadzenChart>
+    }
 }
 
 @code {
     private List<ApplicationUser> users;
+    private List<PieSeries> series;
 
     protected override async Task OnInitializedAsync()
     {
         users = await MbtiService.GetAllUsers();
+
+        var mbtiTypesToInclude = new List<string> { "INTJ", "INFP", "ENTP", "ESFJ", "INFJ", "ENFP" };
+
+        series = users
+        .Where(u => mbtiTypesToInclude.Contains(u.Mbti))
+        .GroupBy(u => u.Mbti)
+        .Select(g => new PieSeries { Category = g.Key, Value = g.Count() })
+        .ToList();
+    }
+
+    public class PieSeries
+    {
+        public string Category { get; set; }
+        public int Value { get; set; }
     }
 }
 
 <style scoped>
-.findMbtiButton a {
-    width: 12%;
-    padding: 10px;
-    margin-top: 10px;
-    color: white;
-    cursor: pointer;
-    font-size: 16px;
-}
+    .findMbtiButton a {
+        width: 12%;
+        padding: 10px;
+        margin-top: 10px;
+        color: white;
+        cursor: pointer;
+        font-size: 16px;
+    }
 </style>
