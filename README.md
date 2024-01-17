@@ -20,7 +20,7 @@ This website is developed using .NET Blazor Server-Side and integrates an AI mod
 To run the website locally, follow these steps:
 
 1. Clone the repository: `git clone https://github.com/SWL-01/4976_Project.git`
-2. Navigate to the project directory: `cd personality-match-website`
+2. Navigate to the project directory: `cd 4976_Project`
 3. Run the project using .NET CLI: `dotnet run`
 
 Make sure you have the latest version of .NET SDK installed on your machine.
